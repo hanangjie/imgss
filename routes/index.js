@@ -57,6 +57,7 @@ router.post('/img', function(req, res, next) {
 
 router.get('/img', function(req, res, next) {
 	var url=req.query.url;
+	var blogid=req.query.blogid;
 	res.header("Access-Control-Allow-Origin", "*");
 		res.header("Access-Control-Allow-Headers", "X-Requested-With");
 		res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
@@ -95,7 +96,7 @@ router.get('/img', function(req, res, next) {
 			+ 'Content-Disposition: form-data; name="blogid"'
 			+ '\r\n\r\n'
 			//+ '测试啊'
-			+ '77601'
+			+ blogid
 			+ '\r\n'
 			+ '--' + boundary
 			+ '\r\n'
