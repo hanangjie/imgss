@@ -75,18 +75,18 @@ router.get('/img', function(req, res, next) {
 	    });
 
 	    res.on("end", function(){
-	        fs.writeFile("./public/logonew.png", imgData, "binary", function(err){
+	        fs.writeFile("./public/logonew.jpg", imgData, "binary", function(err){
 	            if(err){
 	                console.log("down fail");
 	            }
-						result("./public/logonew.png");
+						result("./public/logonew.jpg");
 	        });
 	    });
 
 	});
 
 	function result(img){
-			var fileName="logonew.png";
+			var fileName="logonew.jpg";
 			var datas = fs.readFileSync(img);
 
 			var boundary ="---------------------------leon";
@@ -108,7 +108,7 @@ router.get('/img', function(req, res, next) {
 			+ '\r\n'
 			+ 'Content-Disposition: form-data; name="file"; filename="' + encodeURIComponent(fileName) + '"'
 			+ '\r\n'
-			+ 'Content-Type: image/jpg'
+			+ 'Content-Type: application/octet-stream'
 			+ '\r\n\r\n';
 
 			var formEnd = '\r\n--' + boundary + '--\r\n';
@@ -118,6 +118,16 @@ router.get('/img', function(req, res, next) {
 				port : 8081,
 				method :"POST",
 				path :"/LabHomeAdmin/commonajax/fileupload.do",
+				headers : {
+				"Content-Type":"multipart/form-data; boundary="+ boundary,
+				"Content-Length": formStr.length + datas.length + formEnd.length
+				}
+			};
+			options = {
+				host :"localhost",
+				port : 3003,
+				method :"POST",
+				path :"/upload",
 				headers : {
 				"Content-Type":"multipart/form-data; boundary="+ boundary,
 				"Content-Length": formStr.length + datas.length + formEnd.length
@@ -137,5 +147,14 @@ router.get('/img', function(req, res, next) {
 		}
 });
 
+
+router.post("/upload",function(req,res,next){
+	var url=req.body.blogid;
+	var blogid=req.body.pictype;
+	console.log(url,blogid);
+	res.send({
+		"status":"ok"
+	})
+})
 
 module.exports = router;
