@@ -61,13 +61,13 @@ router.post('/img', function(req, res, next) {
 router.get('/img', function(req, res, next) {
 	var url=req.query.url;
 	var blogid=req.query.blogid;
-     var type=url.split(".")[1];
+     var type="jpg";
 	res.header("Access-Control-Allow-Origin", "*");
 		res.header("Access-Control-Allow-Headers", "X-Requested-With");
 		res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
 		res.header("X-Powered-By",' 3.2.1')
 		res.header("Content-Type", "application/json;charset=utf-8");
-	
+	 console.log("imgget start");
 	http.get(url, function(res){
 	    var imgData = "";
 
@@ -90,12 +90,13 @@ router.get('/img', function(req, res, next) {
 
 	});
 
+/*result("./public/logonew."+type,blogid);*/
 	function result(img,blogid){
 			//各类设置  
 		var opt={  
-		    "url":"http://120.26.67.221:8081/LabHomeAdmin/commonajax/fileupload.do?blogid="+blogid+"&pictype=ordinaryImage",//url  
-		    //"url":"http://localhost:3003/upload",
-		    "file":"./public/logonew."+type,//文件位置  
+		    //r"url":"http://120.26.67.221:8081/LabHomeAdmin/commonajax/fileupload.do?blogid="+blogid+"&pictype=ordinaryImage",//url  
+		    "url":"http://localhost:3003/upload",
+		    "file":"./public/logonew.jpg",//文件位置  
 		    "param":"filedata",//文件上传字段名  
 		    "boundary":"----WebKitFormBoundary"+getBoundary()  
 		}  
@@ -106,19 +107,20 @@ router.get('/img', function(req, res, next) {
 
 
 router.post("/upload",function(req,res,next){
-	console.log("upload start")
 	
   var form = new formidable.IncomingForm();   //创建上传表单
     form.encoding = 'utf-8';        //设置编辑
-    form.uploadDir = '/tmp';    //设置上传目录
+    form.uploadDir = './tmp';    //设置上传目录
     form.keepExtensions = true;  //保留后缀
-    form.maxFieldsSize = 2 * 1024 * 1024;   //文件大小
+    form.maxFieldsSize = 20000 * 1024 * 1024;   //文件大小
 
+
+    console.log("upload start")
   form.parse(req, function(err, fields, files) {
 console.log(files.filedata);
     if (err) {
       res.locals.error = err;
-      res.render('index', { title: TITLE });
+      res.render('index', { title: 1 });
       return;       
     }  
      
@@ -140,7 +142,7 @@ console.log(files.filedata);
 
     if(extName.length == 0){
         res.locals.error = '只支持png和jpg格式图片';
-        res.render('index', { title: TITLE });
+        res.render('index', { title: 1 });
         return;                
     }
 
@@ -207,6 +209,7 @@ function fieldPayload(opts) {
 //post数据  
 function postRequest (opts) {  
     filereadstream(opts,function (buffer) {  
+        console.log("post start")
         var options=require('url').parse(opts.url);  
         var Header={};  
         var h=getBoundaryBorder(opts.boundary);  
