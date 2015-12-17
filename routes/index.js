@@ -61,6 +61,7 @@ router.post('/img', function(req, res, next) {
 router.get('/img', function(req, res, next) {
 	var url=req.query.url;
 	var blogid=req.query.blogid;
+     var type=url.split(".")[1];
 	res.header("Access-Control-Allow-Origin", "*");
 		res.header("Access-Control-Allow-Headers", "X-Requested-With");
 		res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
@@ -78,11 +79,12 @@ router.get('/img', function(req, res, next) {
 	    });
 
 	    res.on("end", function(){
-	        fs.writeFile("./public/logonew.jpg", imgData, "binary", function(err){
+           
+	        fs.writeFile("./public/logonew."+type, imgData, "binary", function(err){
 	            if(err){
 	                console.log("down fail");
 	            }
-						result("./public/logonew.jpg",blogid);
+						result("./public/logonew."+type,blogid);
 	        });
 	    });
 
@@ -91,9 +93,9 @@ router.get('/img', function(req, res, next) {
 	function result(img,blogid){
 			//各类设置  
 		var opt={  
-		   // "url":"http://120.26.67.221:8081/LabHomeAdmin/commonajax/fileupload.do?blogid="+blogid+"&pictype=ordinaryImage",//url  
-		    "url":"http://localhost:3003/upload",
-		    "file":"./public/fly_order_btn.png",//文件位置  
+		    "url":"http://120.26.67.221:8081/LabHomeAdmin/commonajax/fileupload.do?blogid="+blogid+"&pictype=ordinaryImage",//url  
+		    //"url":"http://localhost:3003/upload",
+		    "file":"./public/logonew."+type,//文件位置  
 		    "param":"filedata",//文件上传字段名  
 		    "boundary":"----WebKitFormBoundary"+getBoundary()  
 		}  
@@ -108,7 +110,7 @@ router.post("/upload",function(req,res,next){
 	
   var form = new formidable.IncomingForm();   //创建上传表单
     form.encoding = 'utf-8';        //设置编辑
-    form.uploadDir = 'tmp';    //设置上传目录
+    form.uploadDir = '/tmp';    //设置上传目录
     form.keepExtensions = true;  //保留后缀
     form.maxFieldsSize = 2 * 1024 * 1024;   //文件大小
 
