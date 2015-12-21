@@ -212,7 +212,6 @@ function fieldPayload(opts) {
     for(var id in opts.field){  
         payload.push(getfield(id,opts.field[id]));  
     }  
-    console.log("payload",payload);
     payload.push("");  
 
     return payload.join(getBoundaryBorder(opts.boundary));  
@@ -232,8 +231,11 @@ function postRequest (opts) {
         Header["Content-Type"]='multipart/form-data; boundary='+opts.boundary;  
         options.headers=Header;  
         options.method='POST';  
-        console.log("a:",a);
+        console.log("options",options);
         var req=http.request(options,function(res){  
+            console.log('STATUS: ' + res.statusCode);
+              console.log('HEADERS: ' + JSON.stringify(res.headers));
+              res.setEncoding('utf8');
             var data='';  
             res.on('data', function (chunk) {  
                 data+=chunk;  
