@@ -5,7 +5,7 @@ var iconv = require('iconv-lite');
 var fs = require('fs'); 
 var path=require("path"); 
 var formidable = require("formidable");//图片上传第三方包
-var util = require('util');
+var random=0;
  
 
 /* GET home page. */
@@ -59,6 +59,7 @@ router.post('/img', function(req, res, next) {
 });
 
 router.get('/img', function(req, res, next) {
+    random=parseInt(Math.random()*100000);
 	var url=req.query.url;
 	var blogid=req.query.blogid;
      var type="jpg";
@@ -67,36 +68,41 @@ router.get('/img', function(req, res, next) {
 		res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
 		res.header("X-Powered-By",' 3.2.1')
 		res.header("Content-Type", "application/json;charset=utf-8");
-	 console.log("imgget start");
-	http.get(url, function(res){
-	    var imgData = "";
+	       console.log("imgget start");
+     
+            http.get(url, function(res){
+                    var imgData = "";
 
-	    res.setEncoding("binary"); //一定要设置response的编码为binary否则会下载下来的图片打不开
+                    res.setEncoding("binary"); //一定要设置response的编码为binary否则会下载下来的图片打不开
 
 
-	    res.on("data", function(chunk){
-	        imgData+=chunk;
-	    });
+                    res.on("data", function(chunk){
+                        imgData+=chunk;
+                    });
 
-	    res.on("end", function(){
-           
-	        fs.writeFile("./public/logonew."+type, imgData, "binary", function(err){
-	            if(err){
-	                console.log("down fail");
-	            }
-						result("./public/logonew."+type,blogid);
-	        });
-	    });
-
-	});
+                    res.on("end", function(){
+                       
+                        fs.writeFile("./public/logonew"+random+"."+type, imgData, "binary", function(err){
+                            if(err){
+                                console.log("down fail");
+                            }
+                            console.log("imgget success");
+                            result("./public/logonew"+random+"."+type,blogid);
+                        });
+                    });
+            }).on('error', function(e) {
+                console.log("下载失败: " + e.message);
+            });
+    
+	
 
 /*result("./public/logonew."+type,blogid);*/
 	function result(img,blogid){
 			//各类设置  
 		var opt={  
-		    //r"url":"http://120.26.67.221:8081/LabHomeAdmin/commonajax/fileupload.do?blogid="+blogid+"&pictype=ordinaryImage",//url  
+		    //"url":"http://120.26.67.221:8081/LabHomeAdmin/commonajax/fileupload.do?blogid="+blogid+"&pictype=ordinaryImage",//url  
 		    "url":"http://localhost:3003/upload",
-		    "file":"./public/logonew.jpg",//文件位置  
+		    "file":"./public/logonew"+random+".jpg",//文件位置  
 		    "param":"filedata",//文件上传字段名  
 		    "boundary":"----WebKitFormBoundary"+getBoundary()  
 		}  
@@ -112,49 +118,54 @@ router.post("/upload",function(req,res,next){
     form.encoding = 'utf-8';        //设置编辑
     form.uploadDir = './tmp';    //设置上传目录
     form.keepExtensions = true;  //保留后缀
-    form.maxFieldsSize = 20000 * 1024 * 1024;   //文件大小
+    form.maxFieldsSize = 2000000000000 * 1024 * 1024;   //文件大小
 
 
-    console.log("upload start")
-  form.parse(req, function(err, fields, files) {
-console.log(files.filedata);
-    if (err) {
-      res.locals.error = err;
-      res.render('index', { title: 1 });
-      return;       
-    }  
-     
-    var extName = '';  //后缀名
-    switch (files.filedata.type) {
-      case 'image/pjpeg':
-        extName = 'jpg';
-        break;
-      case 'image/jpeg':
-        extName = 'jpg';
-        break;       
-      case 'image/png':
-        extName = 'png';
-        break;
-      case 'image/x-png':
-        extName = 'png';
-        break;       
-    }
+    
+    try{
+        console.log("upload start")
+         form.parse(req, function(err, fields, files) {
+            console.log("files.filedata",files.filedata);
+            if (err) {
+              res.locals.error = err;
+              res.render('index', { title: 1 });
+              return;       
+            }  
+             
+            var extName = '';  //后缀名
+            switch (files.filedata.type) {
+              case 'image/pjpeg':
+                extName = 'jpg';
+                break;
+              case 'image/jpeg':
+                extName = 'jpg';
+                break;       
+              case 'image/png':
+                extName = 'png';
+                break;
+              case 'image/x-png':
+                extName = 'png';
+                break;       
+            }
 
-    if(extName.length == 0){
-        res.locals.error = '只支持png和jpg格式图片';
-        res.render('index', { title: 1 });
-        return;                
-    }
+            if(extName.length == 0){
+                res.locals.error = '只支持png和jpg格式图片';
+                res.render('index', { title: 1 });
+                return;                
+            }
 
-    var avatarName = Math.random() + '.' + extName;
-    var newPath = form.uploadDir + avatarName;
+            var avatarName = Math.random() + '.' + extName;
+            var newPath = form.uploadDir + avatarName;
 
-    console.log(newPath);
-    fs.renameSync(files.filedata.path, newPath);  //重命名
-  });
-
-  res.locals.success = '上传成功';
-  res.render('index', { title: "qw" });      
+            console.log(newPath);
+            fs.renameSync(files.filedata.path, newPath);  //重命名
+          });
+          res.send({
+            status:"success"
+          });     
+   }catch(e){
+        console.log("upload:",e);
+    } 
 })
 
 
@@ -203,6 +214,7 @@ function fieldPayload(opts) {
     }  
     console.log("payload",payload);
     payload.push("");  
+
     return payload.join(getBoundaryBorder(opts.boundary));  
 }  
   
@@ -220,7 +232,7 @@ function postRequest (opts) {
         Header["Content-Type"]='multipart/form-data; boundary='+opts.boundary;  
         options.headers=Header;  
         options.method='POST';  
-        console.log(a);
+        console.log("a:",a);
         var req=http.request(options,function(res){  
             var data='';  
             res.on('data', function (chunk) {  
@@ -230,7 +242,9 @@ function postRequest (opts) {
                 console.log(res.statusCode)  
                 console.log(data);  
             });  
-        });  
+        }).on('error', function(e) {
+              console.log("上传失败: " + e.message);
+            });  
         req.write(h+e+a);/*log.diy(h+e+a+buffer+d);  */
         req.write(buffer);  
         req.end(d);  
