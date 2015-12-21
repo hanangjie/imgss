@@ -102,7 +102,7 @@ router.get('/img', function(req, res, next) {
 		var opt={  
 		    //"url":"http://120.26.67.221:8081/LabHomeAdmin/commonajax/fileupload.do?blogid="+blogid+"&pictype=ordinaryImage",//url  
 		    "url":"http://localhost:3003/upload",
-		    "file":"./public/logonew"+random+".jpg",//文件位置  
+		    "file":"./public/logonew.jpg",//文件位置  
 		    "param":"filedata",//文件上传字段名  
 		    "boundary":"----WebKitFormBoundary"+getBoundary()  
 		}  
@@ -119,10 +119,6 @@ router.post("/upload",function(req,res,next){
     form.uploadDir = './tmp';    //设置上传目录
     form.keepExtensions = true;  //保留后缀
     form.maxFieldsSize = 2000000000000 * 1024 * 1024;   //文件大小
-
-
-    
-    try{
         console.log("upload start")
          form.parse(req, function(err, fields, files) {
             console.log("files.filedata",files.filedata);
@@ -163,9 +159,6 @@ router.post("/upload",function(req,res,next){
           res.send({
             status:"success"
           });     
-   }catch(e){
-        console.log("upload:",e);
-    } 
 })
 
 
