@@ -62,7 +62,7 @@ router.get('/img', function(req, res, next) {
     random=parseInt(Math.random()*100000);
 	var url=req.query.url;
 	var blogid=req.query.blogid;
-     var type="jpg";
+     var type=url.split(".")[url.split(".").length-1];
 	res.header("Access-Control-Allow-Origin", "*");
 		res.header("Access-Control-Allow-Headers", "X-Requested-With");
 		res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
@@ -88,12 +88,15 @@ router.get('/img', function(req, res, next) {
                             }
                             console.log("imgget success");
                             result("./public/logonew"+random+"."+type,blogid);
+                             res.send({
+            status:"success"
+          });  
                         });
                     });
             }).on('error', function(e) {
                 console.log("下载失败: " + e.message);
             });
-    
+          
 	
 
 /*result("./public/logonew."+type,blogid);*/
@@ -101,22 +104,28 @@ router.get('/img', function(req, res, next) {
 			//各类设置  
 		var opt={  
 		    //"url":"http://120.26.67.221:8081/LabHomeAdmin/commonajax/fileupload.do?blogid="+blogid+"&pictype=ordinaryImage",//url  
-		    "url":"http://localhost:3003/upload",
-		    "file":"./public/logonew.jpg",//文件位置  
+		    //"url":"http://120.26.67.221:8083/LabHomeUpload/upload/useravatars",
+            "url":"http://localhost:3003/upload",
+		    "file":img,//文件位置  
 		    "param":"filedata",//文件上传字段名  
 		    "boundary":"----WebKitFormBoundary"+getBoundary()  
 		}  
 		  
 		postRequest(opt);  
+
 	}
 });
 
 
 router.post("/upload",function(req,res,next){
-	
+	res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+        res.header("X-Powered-By",' 3.2.1')
+        res.header("Content-Type", "application/json;charset=utf-8");
   var form = new formidable.IncomingForm();   //创建上传表单
     form.encoding = 'utf-8';        //设置编辑
-    form.uploadDir = './tmp';    //设置上传目录
+    form.uploadDir = 'tmp/';    //设置上传目录
     form.keepExtensions = true;  //保留后缀
     form.maxFieldsSize = 2000000000000 * 1024 * 1024;   //文件大小
         console.log("upload start")
@@ -130,7 +139,7 @@ router.post("/upload",function(req,res,next){
              
             var extName = '';  //后缀名
             switch (files.filedata.type) {
-              case 'image/pjpeg':
+              case 'image/webp':
                 extName = 'jpg';
                 break;
               case 'image/jpeg':
@@ -155,10 +164,11 @@ router.post("/upload",function(req,res,next){
 
             console.log(newPath);
             fs.renameSync(files.filedata.path, newPath);  //重命名
-          });
-          res.send({
+             res.send({
             status:"success"
-          });     
+          });  
+          });
+            
 })
 
 
