@@ -88,9 +88,7 @@ router.get('/img', function(req, res, next) {
                             }
                             console.log("imgget success");
                             result("./public/logonew"+random+"."+type,blogid);
-                             res.send({
-            status:"success"
-          });  
+                            
                         });
                     });
             }).on('error', function(e) {
