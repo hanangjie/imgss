@@ -193,7 +193,7 @@ var getBoundary=function() {
 }  
 //获取boundary  
 var getBoundaryBorder=function (boundary) {  
-    return '--'+boundary+'\r\n';  
+    return '\r\n'+boundary+'\r\n';  
 }  
 //字段格式化  
 function fieldPayload(opts) {  
