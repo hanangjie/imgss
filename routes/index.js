@@ -173,7 +173,7 @@ router.post("/getBase",function(req,res,next){
                 type = 'png';
                 break;
         }
-        avatarName = "tmp/upload_"+nowTime+"_"+parseInt(Math.random()*1000000) + '.' + type;
+        avatarName = "tmp/uploadH"+nowTime+"Z"+parseInt(Math.random()*1000000) + 'W.' + type;
         fs.writeFile("public/"+avatarName, decodeBase64Image(fields.filedata).data, function(err, fields, files){
             if (err) throw err;
             console.log('It\'s saved!');

@@ -42,10 +42,7 @@
         }
 
 
-    var opts={
-        decodeBase64: false,
-        removeDataUriScheme: false,
-        onFileRead: function(fileCollection){
+    function onFileRead(fileCollection){
             var newHtml='';
 
             $.each(fileCollection, function(i){
@@ -57,20 +54,13 @@
                     var htmlEncoded = htmlEncode(base64Decoded);
                     newHtml += '<p>'+ htmlEncoded + '</p>';
                 }
-
                 if(i !== fileCollection.length-1){
                     newHtml += "<hr />";
                 }
             });
-
-            //Set the text about how many files were dropped. Make it plural when there is more than one!
-            var countText = fileCollection.length + ' file' + ( fileCollection.length === 1 ? '' : 's' ) + ' dropped!';
-
-            //Set the HTML
             $outputArea.html(newHtml);
             $outputArea.parent("form").submit()
         }
-    };
 
     var d = document.getElementById('DropZone');
 
@@ -91,7 +81,7 @@
         var fileArray = [];
         for (var i = 0; i <= fileList.length - 1; i++) {
             var reader = new FileReader();
-            var completeFn = handleFile(fileList[i], fileArray, fileList.length, opts);
+            var completeFn = handleFile(fileList[i], fileArray, fileList.length);
             //兼容判断
             if (reader.addEventListener) {
                 reader.addEventListener('loadend', completeFn, false);
@@ -109,17 +99,12 @@
         e.preventDefault();
         e.dataTransfer.dropEffect = 'copy'; //指定拖放视觉效果
     }
-    function handleFile(theFile, fileArray, fileCount, opts) {
+    function handleFile(theFile, fileArray, fileCount) {
         return function (ev) {
             var fileData = ev.target.result;
 
-            if (opts.removeDataUriScheme) {
                 fileData = fileData.replace(/^data:.*;base64,/, '');
-            }
-            if (opts.decodeBase64) {
                 fileData = decodeBase64String(fileData);
-            }
-
             fileArray.push({
                 name: theFile.name,
                 size: theFile.size,
@@ -127,8 +112,8 @@
                 lastModified: theFile.lastModifiedDate,
                 data: ev.target.result
             });
-            if (fileArray.length === fileCount && $.isFunction(opts.onFileRead)) {
-                opts.onFileRead(fileArray, opts);
+            if (fileArray.length === fileCount && $.isFunction(onFileRead)) {
+                onFileRead(fileArray);
             }
         };
     }
