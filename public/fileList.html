@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" id="DropZone">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-2.1.4.min.js"></script>
+</head>
+<body>
+<form  id="ListsForm" action="/getBase" method="post"  target="iframe" enctype="multipart/form-data">
+    <div  id="Lists" style="height: 100px;width:100px;background: #ededed"></div>
+</form>
+<iframe src="" name="iframe" id="iframe" frameborder="0" style="display: none"></iframe>
+
+
+<script>
+    var $outputArea=$("#Lists");
+    $("#iframe").load(function(){
+        iframeload();
+        
+    });
+    function iframeload(){
+        var io = document.getElementById("iframe");
+        var xml = {};
+        if(io.contentWindow)
+        {
+            xml.responseText = io.contentWindow.document.body?io.contentWindow.document.body.innerHTML:null;
+            xml.responseXML = io.contentWindow.document.XMLDocument?io.contentWindow.document.XMLDocument:io.contentWindow.document;
+
+        }else if(io.contentDocument)
+        {
+            xml.responseText = io.contentDocument.document.body?io.contentDocument.document.body.innerHTML:null;
+            xml.responseXML = io.contentDocument.document.XMLDocument?io.contentDocument.document.XMLDocument:io.contentDocument.document;
+        }
+        var resultData={};
+        try {
+            eval("resultData=" + xml.responseText);
+            var html='<img src="'+resultData.data+'" />';
+                            $("#Lists").html(html);
+        } catch (e) {
+            console.log(e.msg);
+        }
+    }
+
+    var opts={
+        decodeBase64: false,
+        removeDataUriScheme: false,
+        onFileRead: function(fileCollection){
+            var newHtml='';
+
+            //Loop through each file that was dropped
+            $.each(fileCollection, function(i){
+                console.log("data:"+this.data);
+                if(this.type.indexOf('image')>=0){
+                    //newHtml += '<img src="' + this.data + '"/>';
+                    newHtml += '<input type="hidden" name="filedata" value="' + this.data + '"/>';
+                }else{
+                    var noScheme = $.removeUriScheme(this.data);
+                    var base64Decoded = window.atob(noScheme);
+                    var htmlEncoded = htmlEncode(base64Decoded);
+                    newHtml += '<p>'+ htmlEncoded + '</p>';
+                }
+
+                if(i !== fileCollection.length-1){
+                    newHtml += "<hr />";
+                }
+            });
+
+            //Set the text about how many files were dropped. Make it plural when there is more than one!
+            var countText = fileCollection.length + ' file' + ( fileCollection.length === 1 ? '' : 's' ) + ' dropped!';
+
+            //Set the HTML
+            $outputArea.html(newHtml);
+            $outputArea.parent("form").submit()
+        }
+    };
+    function fileDrop(e) {
+        e = e || window.event;
+        e.stopPropagation(); // 阻止冒泡
+        e.preventDefault();  //阻止默认行为
+        var fileList = e.dataTransfer.files;
+
+        //Create an array of file objects for us to fill in
+        var fileArray = [];
+
+        //Loop through each file
+        for (var i = 0; i <= fileList.length - 1; i++) {
+
+            //Create a new file reader to read the file
+            var reader = new FileReader();
+
+            //Create a closure so we can properly pass in the file information since this will complete async!
+            var completeFn = (handleFile)(fileList[i], fileArray, fileList.length, opts);
+
+            //Different browsers implement this in different ways, but call the complete function when the file has finished being read
+            if (reader.addEventListener) {
+                // Firefox, Chrome
+                reader.addEventListener('loadend', completeFn, false);
+            } else {
+                // Safari
+                reader.onloadend = completeFn;
+            }
+
+            //Actually read the file
+            reader.readAsDataURL(fileList[i]);
+        }
+    }
+
+    function dragOver(e) {
+        e = e || window.event;
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy'; //指定拖放视觉效果
+    }
+    var d = document.getElementById('DropZone');
+
+    try {
+        d.addEventListener('dragover', dragOver, false);
+        d.addEventListener('drop', fileDrop, false)
+    } catch(ex) {
+        document.write('something must be wrong!');
+    }
+
+    function handleFile(theFile, fileArray, fileCount, opts) {
+        //When called, it has to return a function back up to the listener event
+        return function (ev) {
+            var fileData = ev.target.result;
+
+            if (opts.removeDataUriScheme) {
+                fileData = $.removeUriScheme(fileData);
+            }
+
+            if (opts.decodeBase64) {
+                fileData = decodeBase64String(fileData);
+            }
+
+            //Add the current file to the array
+            fileArray.push({
+                name: theFile.name,
+                size: theFile.size,
+                type: theFile.type,
+                lastModified: theFile.lastModifiedDate,
+                data: ev.target.result
+            });
+
+            //Once the correct number of items have been put in the array, call the completion function
+            if (fileArray.length === fileCount && $.isFunction(opts.onFileRead)) {
+                opts.onFileRead(fileArray, opts);
+            }
+        };
+    }
+    $.removeUriScheme = function (str) {
+        return str.replace(/^data:.*;base64,/, '');
+    };
+    function decodeBase64String(str) {
+        var decoded = window.atob(str);
+        try {
+            return decodeURIComponent(window.escape(decoded));
+        } catch (ex) {
+            return '';
+        }
+    }
+
+    (function (window) {
+        //Via: http://phpjs.org/functions/base64_decode/
+        function base64_decode(data) {
+            /*jshint bitwise: false, eqeqeq:false*/
+            var b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+            var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+                    ac = 0,
+                    dec = '',
+                    tmp_arr = [];
+
+            if (!data) {
+                return data;
+            }
+
+            data += '';
+
+            do { // unpack four hexets into three octets using index points in b64
+                h1 = b64.indexOf(data.charAt(i++));
+                h2 = b64.indexOf(data.charAt(i++));
+                h3 = b64.indexOf(data.charAt(i++));
+                h4 = b64.indexOf(data.charAt(i++));
+
+                bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+
+                o1 = bits >> 16 & 0xff;
+                o2 = bits >> 8 & 0xff;
+                o3 = bits & 0xff;
+
+                if (h3 == 64) {
+                    tmp_arr[ac++] = String.fromCharCode(o1);
+                } else if (h4 == 64) {
+                    tmp_arr[ac++] = String.fromCharCode(o1, o2);
+                } else {
+                    tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
+                }
+            } while (i < data.length);
+
+            dec = tmp_arr.join('');
+
+            return dec;
+        }
+
+        if (!window.atob) {
+            window.atob = base64_decode;
+        }
+
+    })(window);
+</script>
+</body>
+</html>

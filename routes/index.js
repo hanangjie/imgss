@@ -145,6 +145,59 @@ router.get('/img', function(req, res, next) {
     }
 });
 
+//接受base64图片
+router.post("/getBase",function(req,res,next){
+    var avatarName="";
+    var form = new formidable.IncomingForm();   //创建上传表单
+    form.encoding = 'utf-8';        //设置编辑
+    form.uploadDir = 'tmp/';    //设置上传目录
+    form.keepExtensions = true;  //保留后缀
+    form.maxFieldsSize = 2000000000000 * 1024 * 1024;   //文件大小
+
+    form.parse(req, function(err, fields, files) {
+        var nowTime=Date.now();
+        var data=decodeBase64Image(fields.filedata).data;
+        var type=decodeBase64Image(fields.filedata).type;
+
+        switch (type) {
+            case 'image/webp':
+                type = 'jpg';
+                break;
+            case 'image/jpeg':
+                type = 'jpg';
+                break;
+            case 'image/png':
+                type = 'png';
+                break;
+            case 'image/x-png':
+                type = 'png';
+                break;
+        }
+        avatarName = "tmp/upload_"+nowTime+"_"+parseInt(Math.random()*1000000) + '.' + type;
+        fs.writeFile("public/"+avatarName, decodeBase64Image(fields.filedata).data, function(err, fields, files){
+            if (err) throw err;
+            console.log('It\'s saved!');
+            res.send('{data:"'+avatarName+'"}');
+        });
+    });
+    function decodeBase64Image(dataString)
+    {
+        var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+        var response = {};
+
+        if (matches.length !== 3)
+        {
+            return new Error('Invalid input string');
+        }
+
+        response.type = matches[1];
+        response.data = new Buffer(matches[2], 'base64');
+        console.log(response);
+        return response;
+    }
+
+
+});
 
 router.post("/upload",function(req,res,next){
 	res.header("Access-Control-Allow-Origin", "*");
@@ -157,7 +210,7 @@ router.post("/upload",function(req,res,next){
     form.uploadDir = 'tmp/';    //设置上传目录
     form.keepExtensions = true;  //保留后缀
     form.maxFieldsSize = 2000000000000 * 1024 * 1024;   //文件大小
-        console.log("upload start")
+        console.log("upload start");
          form.parse(req, function(err, fields, files) {
             console.log("files.filedata",files.filedata);
             if (err) {
@@ -167,6 +220,7 @@ router.post("/upload",function(req,res,next){
             }  
              
             var extName = '';  //后缀名
+             console.log(files.filedata.type);
             switch (files.filedata.type) {
               case 'image/webp':
                 extName = 'jpg';
@@ -184,14 +238,14 @@ router.post("/upload",function(req,res,next){
 
             if(extName.length == 0){
                 res.locals.error = '只支持png和jpg格式图片';
-                res.render('index', { title: 1 });
+                 res.render('index', { title: 1 });
                 return;                
             }
 
             var avatarName = Math.random() + '.' + extName;
             var newPath = form.uploadDir + avatarName;
 
-            console.log(newPath);
+            console.log("newPath",newPath);
             fs.renameSync(files.filedata.path, newPath);  //重命名
              res.send({
             status:"success"
