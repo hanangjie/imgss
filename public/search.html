@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-2.1.4.min.js"></script>
+    <script src="js/imgSearch.js"></script>
+</head>
+<body>
+<div class="editor-searchImg">
+    <input type="text" placeholder="搜索图片"  >
+    <a id="imgSubmit" class="btn btn-info" href="javascript:">搜索</a>
+</div>
+<div class="editor-resultImg">
+
+</div>
+<div class="lookmore" style="display:none;">
+    <a href="javascript:" id="search-lookmore" class="btn btn-info">查看更多</a>
+</div>
+
+
+<style type="text/css">
+
+    .editor-searchImg{text-align: center;background:#d9d9d9;}
+    .editor-searchImg a{margin-bottom: 10px;padding: 4px 20px;}
+    .editor-resultImg{overflow:hidden;background:#d9d9d9;text-align: center;padding:10px 0px;}
+    .editor-resultImg span{background-size: contain;float: left;
+        background-color:#333;display:block;
+        background-repeat: no-repeat;
+        background-position: center center;
+        width: 149px;
+        margin: 10px 10px 0px 10px;
+        height: 122px;
+        border:3px solid #dedede;
+        cursor:pointer;}
+    .editor-resultImg span.on{border:3px solid red;}
+    .lookmore{background:#d9d9d9;text-align:center;padding:20px 0px;}
+
+    .imgTips{width:100%;float: left;}
+</style>
+</body>
+</html>
