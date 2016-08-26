@@ -8,7 +8,7 @@ var debug = require('debug')('imgss:url');
 
 
 router.post('/img', function(req, res, next) {
-
+    console.log("start")
     var name=req.body.name;
     var first=req.body.first;
     if(name){
@@ -21,7 +21,7 @@ router.post('/img', function(req, res, next) {
         hostname: "pic.sogou.com",
         path: "/pics?query="+name+"&mood=0&picformat=0&mode=1&di=0&reqType=ajax&tn=0&reqFrom=result&start="+(first||0)
     }];
-    var optioni=2;
+    var optioni=1;
     var resultHtml="";
     var imgList=[];
     var urlReq = http.request(option[optioni], function(res) {
@@ -34,7 +34,7 @@ router.post('/img', function(req, res, next) {
                 sendList();
             })
         }).on("error", function(e) {
-            console.log("e="+e.message);
+            console.log("error="+e.message);
         });
         urlReq.end();
     res.header("Access-Control-Allow-Origin", "*");
