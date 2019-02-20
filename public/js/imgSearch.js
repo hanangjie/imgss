@@ -1,6 +1,5 @@
 $(function(){
-	var localUrl="http://112.124.9.65:3003/img";
-	 localUrl="http://localhost:3003/imgUrl/img";
+	var localUrl ="/imgUrl/img";
 	$("#imgSubmit").click(function(){
 		var val=$(".editor-searchImg input").val();
 		$.ajax({
@@ -26,39 +25,7 @@ $(function(){
 				$(".lookmore").show();
 			}
 			$(".editor-resultImg").html(html);
-
-			
 		});
-	});
-
-	//选中
-	$(document).on("click",".editor-resultImg span",function(){
-		var $this=$(this);
-		var src=$(this).attr("data-img");
-		if($(this).hasClass("on")){
-			$(this).removeClass("on");
-		}else{
-			if($this.data("down")){
-				//下载过
-			}else{
-				$.ajax({
-					type:"get",
-					url:localUrl,
-					data:{
-						url:src,
-						blogid:blogid
-					}
-				}).done(function(e){
-					if(e.status==1000){
-						$(".editor-imgList").prepend('<span class="img" ><img src="'+ e.original+'"></span>');
-						$this.attr("data-img",e.original).data("down",true);
-					}
-				});
-			}
-			$(this).addClass("on");
-
-		}
-
 	});
 
 	//查看更多
