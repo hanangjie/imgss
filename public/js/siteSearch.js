@@ -36,6 +36,7 @@ $(function(){
 
 function getImg(val, dom) {
 	var localUrl ="/siteImg/getimg";
+	$(".tips").html('');
 	$.ajax({
 		type:"post",
 		url:localUrl,
@@ -44,6 +45,10 @@ function getImg(val, dom) {
 			url:val
 		}
 	}).done(function(data){
+		if (data.error) {
+			$(".tips").html("网络错误");
+			return;
+		}
 		var newdata = data.resultHtml;
 		var html="";
 		for(var i=0;i<newdata.length;i++){

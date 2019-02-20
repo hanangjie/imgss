@@ -7,7 +7,6 @@ var iconv = require('iconv-lite');
 router.post('/getImg', function(req, res, next) {
   // const url = 'http://idol.takeshobo.co.jp';
   const url = req.body.url;
-  console.log(url)
   const host = url.split(":")[0];
   var urlReq = createRequest(url, host, '', res)
   urlReq.end();
@@ -51,7 +50,7 @@ function filteHtml(htmlString) {
 }
 
 function createRequest(url, host, resultHtml, res) {
-  return http.request(url,{encode:'utf-8'}, function(response) {
+  return http.request(url, function(response) {
     response.on("data", function(chunk) {
       resultHtml+=iconv.decode(chunk, "utf-8");
     });
@@ -65,5 +64,8 @@ function createRequest(url, host, resultHtml, res) {
     })
   }).on("error", function(e) {
       console.log("error="+e.message);
+      res.send({
+        error: e.message
+      });
   });
 }
