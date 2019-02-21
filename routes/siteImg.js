@@ -66,6 +66,14 @@ function createRequest(url, host, resultHtml, res) {
     });
     response.on('end',function(){
       resultHtml = resultHtml.split('<body')[1]
+      if (!resultHtml) {
+        res.send({
+          resultHtml: [],
+          url: [],
+          html: ''
+        });
+        return;
+      }
       res.send({
         resultHtml: filteHtml(resultHtml),
         url: getUrl(resultHtml, url, host),

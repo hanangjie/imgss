@@ -1,11 +1,15 @@
+var searchList = [];
+
 $(function(){
-	var localUrl ="/siteImg/getimg";
+	var localUrl = "/siteImg/getimg";
 	var requestObj = {}; 
 	$("#imgSubmit").click(function(){
 		$(".editor-resultImg").html("");
 		$('.tab').remove();
 		var val=$(".editor-searchImg input").val();
+		searchList = []
 		getImg(val, $(".editor-resultImg"));
+		searchList.push(val+'/')
 	});
 	$("body").on("click",".tab", function(e){
 		if(!$(this).html().includes('div')) {
@@ -39,6 +43,7 @@ $(function(){
 });
 
 function getImg(val, dom) {
+	searchList.push(val);
 	var localUrl ="/siteImg/getimg";
 	$(".tips").html('');
 	$.ajax({
@@ -60,12 +65,12 @@ function getImg(val, dom) {
 			img.src = newdata[i];
 			const imgId = `imgId${parseInt(Math.random()*100000)}`
 			img.onload = (e) => {
-				if(e.path[0].width < 121 || e.path[0].height < 121) {
+				if(e.path[0].width < 151 || e.path[0].height < 151) {
 					$(`#${imgId}`).remove()
 				}
 			}
 			html+=`<span id="${imgId}">
-				<img src="${newdata[i]}" style="max-width:10px;max-height:10px">
+				<img src="${newdata[i]}">
 			</span>`;
 		}
 		html+='</div>'
@@ -79,6 +84,7 @@ function getImg(val, dom) {
 		// 	$(".lookmore").show();
 		// }
 		dom.html(html);
+		data.url = data.url.filter(e => !searchList.includes(e))
 		urlHandel(data.url, dom);
 	});
 }
