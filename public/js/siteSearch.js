@@ -2,6 +2,8 @@ $(function(){
 	var localUrl ="/siteImg/getimg";
 	var requestObj = {}; 
 	$("#imgSubmit").click(function(){
+		$(".editor-resultImg").html("");
+		$('.tab').remove();
 		var val=$(".editor-searchImg input").val();
 		getImg(val, $(".editor-resultImg"));
 	});
@@ -56,7 +58,7 @@ function getImg(val, dom) {
 			img.src = newdata[i];
 			const imgId = `imgId${parseInt(Math.random()*100000)}`
 			img.onload = (e) => {
-				if(e.path[0].width < 100 || e.path[0].height < 100) {
+				if(e.path[0].width < 121 || e.path[0].height < 121) {
 					$(`#${imgId}`).remove()
 				}
 			}

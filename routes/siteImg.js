@@ -58,7 +58,8 @@ function createRequest(url, host, resultHtml, res) {
       resultHtml = resultHtml.split('<body')[1]
       res.send({
         resultHtml: filteHtml(resultHtml),
-        url: getUrl(resultHtml, url, host)
+        url: getUrl(resultHtml, url, host),
+        html: resultHtml
       });
       console.log('end')
     })
