@@ -8,7 +8,9 @@ $(function(){
 		getImg(val, $(".editor-resultImg"));
 	});
 	$("body").on("click",".tab", function(e){
-		getImg($(e.target)[0].innerHTML, $(this));
+		if(!$(this).html().includes('div')) {
+			getImg($(e.target)[0].innerHTML, $(this));
+		}
 	})
 	//查看更多
 	$("#search-lookmore").click(function(){
@@ -52,7 +54,7 @@ function getImg(val, dom) {
 			return;
 		}
 		var newdata = data.resultHtml;
-		var html="";
+		var html="<div style='overflow:hidden'>";
 		for(var i=0;i<newdata.length;i++){
 			const img = new Image();
 			img.src = newdata[i];
@@ -63,9 +65,10 @@ function getImg(val, dom) {
 				}
 			}
 			html+=`<span id="${imgId}">
-				<img src="${newdata[i]}" style="max-width:149px;max-height:122px">
+				<img src="${newdata[i]}" style="max-width:10px;max-height:10px">
 			</span>`;
 		}
+		html+='</div>'
 		// url 继续请求
 		// if(data.length<34&&data.length>0){
 		// 	html+="<div class='imgTips'>已加载全部</div>";
@@ -76,14 +79,14 @@ function getImg(val, dom) {
 		// 	$(".lookmore").show();
 		// }
 		dom.html(html);
-		urlHandel(data.url, 'editor-resultImg');
+		urlHandel(data.url, dom);
 	});
 }
 
 function urlHandel(urlList, dom) {
 	let html = '';
 	urlList.forEach(e => {
-		html += `<div class="tab ${dom}-children">${e}</div>`;
+		html += `<div class="tab">${e}</div>`;
 	})
-	$(`.${dom}`).after(html)
+	dom.append(html)
 }

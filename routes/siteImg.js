@@ -16,14 +16,15 @@ router.post('/getImg', function(req, res, next) {
 module.exports = router;
 
 function getUrl(htmlString, url, host) {
+  const domain = url.split('/')[2]
   let arr = [];
   arr = arr.concat(htmlString.match(/href="[a-z\:\/\.\_\-0-9]+"/g))
   .filter((e) => {
-    return !/.css/g.test(e) && !/.ico/g.test(e);
+    return !/.css/g.test(e) && !/.ico/g.test(e) && !/.jpg/g.test(e) && !/.png/g.test(e);
   })
   .filter((e) => {
     let result = true;
-    if(e.includes('http') && (!e.includes(url) || e.split(":")[1] === `${url.split(":")[1]}"` || e.split(":")[1] === `${url.split(":")[1]}/"`)) {
+    if(e.includes('http') && (!e.includes(domain) || e.split(":")[1] === `${url.split(":")[1]}"` || e.split(":")[1] === `${url.split(":")[1]}/"`)) {
       result = false;
     }
     return result;
@@ -41,12 +42,21 @@ function getUrl(htmlString, url, host) {
 
 function filteHtml(htmlString) {
   let arr = [];
+  let hrefArr = [];
 	arr = arr.concat(htmlString.match(/src="[a-z\:\/\.\_\-0-9]+"/g))
 	.filter(e => !/.js/g.test(e))
 	.map(e => {
 		return e.replace('src="', '').slice(0,-1)
+  });
+  hrefArr = hrefArr.concat(htmlString.match(/href="[a-z\:\/\.\_\-0-9]+"/g))
+  .filter((e) => {
+    return /.jpg/g.test(e) || /.png/g.test(e);
+  })
+	.map(e => {
+    let r = e.replace('href="', '').slice(0,-1);
+		return r;
 	})
-  return arr;
+  return arr.concat(hrefArr);
 }
 
 function createRequest(url, host, resultHtml, res) {
