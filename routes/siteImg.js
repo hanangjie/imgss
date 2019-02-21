@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var http = require("http");
+var https = require("https");
 var iconv = require('iconv-lite');
 
 
@@ -60,7 +61,11 @@ function filteHtml(htmlString) {
 }
 
 function createRequest(url, host, resultHtml, res) {
-  return http.request(url, function(response) {
+  let hostCreater = http;
+  if (host === 'https') {
+    hostCreater = https;
+  }
+  return hostCreater.request(url, function(response) {
     response.on("data", function(chunk) {
       resultHtml+=iconv.decode(chunk, "utf-8");
     });

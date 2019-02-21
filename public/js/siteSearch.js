@@ -40,6 +40,15 @@ $(function(){
 			$(".editor-resultImg").append(html);
 		});
 	});
+
+	//调整图片尺寸
+	$('#size').change(function(e) {
+		$("#style").append(`
+		.editor-resultImg span img{
+			max-width:${e.target.value}px;
+			max-height:${e.target.value}px;
+		}`);
+	})
 });
 
 function getImg(val, dom) {
