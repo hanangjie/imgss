@@ -1,7 +1,9 @@
 var searchList = [];
-
+var localUrl = "/siteImg/getimg";
+localUrl = 'https://www.zhikong4.com/web/getImg';
+//localUrl = '//127.0.0.1:7001/web/getImg'
+localUrl = '//127.0.0.1:7001/web/imgAll'
 $(function(){
-	var localUrl = "/siteImg/getimg";
 	var requestObj = {}; 
 	$("#imgSubmit").click(function(){
 		$(".editor-resultImg").html("");
@@ -49,11 +51,27 @@ $(function(){
 			max-height:${e.target.value}px;
 		}`);
 	})
+
+	$("#imgShow").click(() => {
+		$.ajax({
+			type:"get",
+			url:'./js/img.txt',
+			dataType:"json",
+		}).done(function(data){
+			var html="<div style='overflow:hidden'>";
+			Object.keys(data).forEach(e => {	
+				html+=`<span>
+					<img src="${e}">
+				</span>`;
+			})
+			html+='</div>'
+			$(".editor-resultImg").html(html);
+		})
+	})
 });
 
 function getImg(val, dom) {
 	searchList.push(val);
-	var localUrl ="/siteImg/getimg";
 	$(".tips").html('');
 	$.ajax({
 		type:"post",
